@@ -123,7 +123,7 @@ sed -i 's/PermitRootLogin yes/PermitRootLogin no/g' /etc/ssh/sshd_config      # 
 {
   echo " "
   echo "# Users allowed to use ssh :"
-  echo "AllowUsers "$SSH_USER"
+  echo "AllowUsers "$SSH_USER""
 } >> /etc/ssh/sshd_config
 
 # Restart ssh :
