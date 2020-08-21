@@ -33,7 +33,7 @@
 SSH_PORT=426969
 
 # Set users (separated with a space) that will have the right to log in through ssh :
-SSH_USER="debian" "machine_nr"
+SSH_USER= debian machine_nr
 
 # Set ban time in seconds (default to 1h):
 F2B_BAN_TIME=600
@@ -123,7 +123,7 @@ sed -i 's/PermitRootLogin yes/PermitRootLogin no/g' /etc/ssh/sshd_config      # 
 {
   echo " "
   echo "# Users allowed to use ssh :"
-  echo "AllowUsers "$SSH_USER""
+  echo "AllowUsers "$SSH_USER"
 } >> /etc/ssh/sshd_config
 
 # Restart ssh :
