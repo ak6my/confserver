@@ -30,10 +30,10 @@
 # - ssh double authent
 
 # Set the port you want to use for ssh :
-SSH_PORT=426969
+SSH_PORT=42699
 
 # Set users (separated with a space) that will have the right to log in through ssh :
-SSH_USER= debian machine_nr
+SSH_USER="debian" "machine_nr"
 
 # Set ban time in seconds (default to 1h):
 F2B_BAN_TIME=600
@@ -50,18 +50,18 @@ PORT_OPEN[4]=25     # SMTP
 PORT_OPEN[5]=587    # SMTP SARTTLS
 PORT_OPEN[6]=993    # IMAPS SSL/TLS
 PORT_OPEN[7]=4190   # Sieve SARTTLS
-PORT_OPEN[8]=22     # SSH : used for honeypotting
+PORT_OPEN[8]=42699     # SSH : used for honeypotting
 
 # Set knock sequense :
-PORT_KNOCK[0]=7000
-PORT_KNOCK[1]=8000
-PORT_KNOCK[2]=9000
-PORT_KNOCK[3]=10000
-PORT_KNOCK[4]=11000
+# PORT_KNOCK[0]=7000
+# PORT_KNOCK[1]=8000
+# PORT_KNOCK[2]=9000
+# PORT_KNOCK[3]=10000
+# PORT_KNOCK[4]=11000
 
 # Portsentry ignore IPs:
-PORTSENTRY_IGNORE[0]=8.8.8.8
-PORTSENTRY_IGNORE[1]=8.8.4.4
+# PORTSENTRY_IGNORE[0]=8.8.8.8
+# PORTSENTRY_IGNORE[1]=8.8.4.4
 
 # Telegram messaging:
 # ( See https://github.com/zerpex/scripts/tree/master/telegram for script and how to. )
@@ -178,40 +178,40 @@ netfilter-persistent reload       # Reload rules.
 #   knockd    #
 ###############
 
-KNOCK_SEQ=
-for i in "${PORT_KNOCK[@]}"; do
-  if [ -z "$KNOCK_SEQ" ]; then
-    KNOCK_SEQ=$i
-  else
-    KNOCK_SEQ=$KNOCK_SEQ","$i
-  fi
-done
+# KNOCK_SEQ=
+# for i in "${PORT_KNOCK[@]}"; do
+  # if [ -z "$KNOCK_SEQ" ]; then
+    # KNOCK_SEQ=$i
+  # else
+    # KNOCK_SEQ=$KNOCK_SEQ","$i
+  # fi
+# done
 
-# Set knockd config :
-cat > knockd.tmp <<- EOM
-[options]
-      logfile   = /var/log/knockd.log
-      interface = WAN
-[SSH]
-      sequence      = KNOCK_SEQ
-      seq_timeout   = 5
-      start_command = /sbin/iptables -I INPUT -s %IP% -p tcp --dport SSH_PORT -j ACCEPT
-      tcpflags      = syn
-      cmd_timeout   = 10
-      stop_command = /sbin/iptables -D INPUT -s %IP% -p tcp --dport SSH_PORT -j ACCEPT
-EOM
+# # Set knockd config :
+# cat > knockd.tmp <<- EOM
+# [options]
+      # logfile   = /var/log/knockd.log
+      # interface = WAN
+# [SSH]
+      # sequence      = KNOCK_SEQ
+      # seq_timeout   = 5
+      # start_command = /sbin/iptables -I INPUT -s %IP% -p tcp --dport SSH_PORT -j ACCEPT
+      # tcpflags      = syn
+      # cmd_timeout   = 10
+      # stop_command = /sbin/iptables -D INPUT -s %IP% -p tcp --dport SSH_PORT -j ACCEPT
+# EOM
 
-sed -i "s/WAN/$WAN/g" knockd.tmp
-sed -i "s/KNOCK_SEQ/$KNOCK_SEQ/g" knockd.tmp
-sed -i "s/SSH_PORT/$SSH_PORT/g" knockd.tmp
+# sed -i "s/WAN/$WAN/g" knockd.tmp
+# sed -i "s/KNOCK_SEQ/$KNOCK_SEQ/g" knockd.tmp
+# sed -i "s/SSH_PORT/$SSH_PORT/g" knockd.tmp
 
-cat knockd.tmp > /etc/knockd.conf && rm knockd.tmp
+# cat knockd.tmp > /etc/knockd.conf && rm knockd.tmp
 
-# Set autostart for knockd :
-sed -i 's/START_KNOCKD=0/START_KNOCKD=1/g' /etc/default/knockd
+# # Set autostart for knockd :
+# sed -i 's/START_KNOCKD=0/START_KNOCKD=1/g' /etc/default/knockd
 
-# Start knockd :
-systemctl start knockd
+# # Start knockd :
+# systemctl start knockd
 
 ###############
 # Portsentry  #
