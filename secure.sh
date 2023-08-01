@@ -108,7 +108,7 @@ fi
 apt update
 echo iptables-persistent iptables-persistent/autosave_v4 boolean true | debconf-set-selections
 echo iptables-persistent iptables-persistent/autosave_v6 boolean true | debconf-set-selections
-apt -y install iptables iptables-persistent fail2ban 
+apt install iptables iptables-persistent fail2ban 
 #libpam-google-authenticator portsentry  knockd
 
 ###############
