@@ -30,10 +30,10 @@
 # - ssh double authent
 
 # Set the port you want to use for ssh :
-SSH_PORT=42699
+SSH_PORT=50000
 
 # Set users (separated with a space) that will have the right to log in through ssh :
-SSH_USER="debian" "machine_nr"
+SSH_USER="debian" "sanro"
 
 # Set ban time in seconds (default to 1h):
 F2B_BAN_TIME=600
@@ -50,7 +50,7 @@ PORT_OPEN[4]=25     # SMTP
 PORT_OPEN[5]=587    # SMTP SARTTLS
 PORT_OPEN[6]=993    # IMAPS SSL/TLS
 PORT_OPEN[7]=4190   # Sieve SARTTLS
-PORT_OPEN[8]=42699     # SSH : used for honeypotting
+PORT_OPEN[8]=50000     # SSH : used for honeypotting
 
 # Set knock sequense :
 # PORT_KNOCK[0]=7000
@@ -108,8 +108,8 @@ fi
 apt update
 echo iptables-persistent iptables-persistent/autosave_v4 boolean true | debconf-set-selections
 echo iptables-persistent iptables-persistent/autosave_v6 boolean true | debconf-set-selections
-apt -y install iptables iptables-persistent knockd fail2ban 
-#libpam-google-authenticator portsentry
+apt -y install iptables iptables-persistent fail2ban 
+#libpam-google-authenticator portsentry  knockd
 
 ###############
 #     SSH     #
@@ -140,13 +140,13 @@ iptables -P INPUT DROP                                                   # Drop 
 iptables -P OUTPUT ACCEPT                                                  # Drop all output connections.
 iptables -P FORWARD DROP                                                 # Drop all forward connections.
 iptables -A INPUT -i lo -j ACCEPT                                        # Allow input on loopback.
-#iptables -A OUTPUT -o lo -j ACCEPT                                       # Allow input on loopback.
+iptables -A OUTPUT -o lo -j ACCEPT                                       # Allow input on loopback.
 iptables -A INPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT   # Don't break established connections.
 iptables -A INPUT -p icmp -j ACCEPT                                      # Allow ping request
-#iptables -A OUTPUT -m conntrack --ctstate ESTABLISHED -j ACCEPT          # Don't break established connections.
+iptables -A OUTPUT -m conntrack --ctstate ESTABLISHED -j ACCEPT          # Don't break established connections.
 for i in "${PORT_OPEN[@]}"; do
   iptables -A INPUT -p tcp --dport $i -j ACCEPT                          # Set specified rules.
-  #iptables -A OUTPUT -p tcp --sport $i -j ACCEPT                          # Set specified rules.
+  iptables -A OUTPUT -p tcp --sport $i -j ACCEPT                          # Set specified rules.
 done
 
 # # Docker specific
@@ -272,34 +272,34 @@ fail2ban-client reload
 #  Finishing  #
 ###############
 
-echo -e " "
-echo -e "Everything is installed."
-echo -e " "
-echo -e "Please, open a second terminal with the user that will use OTP and execute :"
-echo -e "google-authenticator"
-echo -e "It will generate a QR Code that you need to flash using your smartphone and Google authenticator."
-echo -e "Quick answers : y/y/n/y (better read questions before answering :p )"
-echo -e " "
-echo -e "Once done, write 'yes' here or no if you don't want:"
-echo -e "/!\ Ensure that you really did it and save the codes somewhere."
-read -r GO
-if [ "$GO" == "yes" ]; then
+#echo -e " "
+#echo -e "Everything is installed."
+#echo -e " "
+#echo -e "Please, open a second terminal with the user that will use OTP and execute :"
+#echo -e "google-authenticator"
+#echo -e "It will generate a QR Code that you need to flash using your smartphone and Google authenticator."
+#echo -e "Quick answers : y/y/n/y (better read questions before answering :p )"
+#echo -e " "
+#echo -e "Once done, write 'yes' here or no if you don't want:"
+#echo -e "/!\ Ensure that you really did it and save the codes somewhere."
+#read -r GO
+#if [ "$GO" == "yes" ]; then
   # Activate OTP on login :
-  {
-    echo " "
-    echo "# Activate One Time Password on login :"
-    echo "    auth required pam_google_authenticator.so"
-  } >> /etc/pam.d/sshd
-  sed -i "s/ChallengeResponseAuthentication no/ChallengeResponseAuthentication yes/g" /etc/ssh/sshd_config
+ # {
+  #  echo " "
+   # echo "# Activate One Time Password on login :"
+    #echo "    auth required pam_google_authenticator.so"
+  #} >> /etc/pam.d/sshd
+ # sed -i "s/ChallengeResponseAuthentication no/ChallengeResponseAuthentication yes/g" /etc/ssh/sshd_config
 
   # Restart ssh :
-  /etc/init.d/ssh restart
-  echo " "
-  echo -e "OTP was activated."
-else
-  echo " "
-  echo -e "OTP was not activated."
-fi
+  #/etc/init.d/ssh restart
+  #echo " "
+  #echo -e "OTP was activated."
+#else
+ # echo " "
+ # echo -e "OTP was not activated."
+#fi
 
 echo " "
 echo -e "IMPORTANT:"
